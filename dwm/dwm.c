@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -56,6 +57,8 @@
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
+
+#define RESTORE_PATCH_SEL_PREFIX "Selected: "
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
@@ -1259,10 +1262,98 @@ propertynotify(XEvent *e)
 }
 
 void
+saveSession(void)
+{
+	FILE *fw = fopen(SESSION_FILE, "w");
+	if (!fw) {
+		return;
+	}
+
+	for (Client *c = selmon->clients; c != NULL; c = c->next) {
+		fprintf(fw, RESTORE_PATCH_SEL_PREFIX"%lu %u\n", selmon->sel->win, selmon->sel->tags);
+	}
+
+	fclose(fw);
+
+}
+
+void restoreSession(void)
+{
+	FILE *fr = fopen(SESSION_FILE, "r");
+	if (!fr) {
+		return;
+	}
+
+	int wasFocused = false;
+	Client *lastFocusedClient = NULL;
+	unsigned int lastFocusedClientTag = 0;
+
+	char *str = malloc(23 * sizeof(char));
+	while(fscanf(fr, "%[^\n] ", str) != EOF) {
+		long unsigned int winID;
+		unsigned int tagsForWin;
+
+		if (!wasFocused) {
+			int check = sscanf(str, RESTORE_PATCH_SEL_PREFIX"%lu %u", &winID, &tagsForWin);
+			if (check == 2) {
+				lastFocusedClientTag = tagsForWin;
+				 for (Client * c = selmon->clients; c != NULL; c = c->next) {
+					 if (winID == c->win) {
+						 lastFocusedClient = c;
+						 wasFocused = true;
+						 break;
+					 }
+				 }
+			}
+		}
+
+		int check = sscanf(str, "%lu %u", &winID, &tagsForWin);
+		if (check != 2) {
+			break;
+		}
+
+		for (Client *c = selmon->clients; c ; c = c->next) {
+			if (c->win == winID) {
+				c->tags = tagsForWin;
+				break;
+			}
+
+		}
+	}
+
+	for (Client *c = selmon->clients; c ; c = c->next) {
+		focus(c);
+		restack(c->mon);
+	}
+
+	for (Monitor *m = selmon; m; m = m->next) {
+		arrange(m);
+	}
+
+	if (wasFocused == true) {
+		Arg arg;
+		arg.ui = lastFocusedClientTag;
+		view(&arg);
+
+		focus(lastFocusedClient);
+		restack(lastFocusedClient->mon);
+	}
+
+	free(str);
+	fclose(fr);
+
+	remove(SESSION_FILE);
+}
+
+void
 quit(const Arg *arg)
 {
 	if(arg->i) restart = 1;
 	running = 0;
+
+	if (restart == 1) {
+		saveSession();
+	}
 }
 
 Monitor *
@@ -2179,6 +2270,7 @@ main(int argc, char *argv[])
 		die("pledge");
 #endif /* __OpenBSD__ */
 	scan();
+	restoreSession();
 	run();
 	if(restart) execvp(argv[0], argv);
 	cleanup();
