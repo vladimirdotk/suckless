@@ -7,7 +7,7 @@
  */
 static char *font =
     "JetBrainsMonoNerdFontMono:pixelsize=14:antialias=true:autohint=true";
-static int borderpx = 0;
+static int borderpx = 5;
 static const int resizehints = 0;
 
 /*
