@@ -6,7 +6,7 @@
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
 static char *font =
-    "JetBrainsMonoNerdFontMono:pixelsize=14:antialias=true:autohint=true";
+    "JetBrainsMonoNerdFontMono:pixelsize=15:antialias=true:autohint=true";
 static int borderpx = 5;
 static const int resizehints = 0;
 
