@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=DWM
+Comment=Dynamic Window Manager
+Exec=/usr/local/bin/startdwm.sh
+TryExec=/usr/local/bin/startdwm.sh
+Type=Application
+DesktopNames=DWM
+X-GDM-SessionRegisters=true
+
+
