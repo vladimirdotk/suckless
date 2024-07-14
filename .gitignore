@@ -9,3 +9,5 @@
 
 # Ignore object files
 *.o
+
+flexipatch-finalizer/
