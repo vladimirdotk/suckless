@@ -9,9 +9,9 @@ static const unsigned int snap = 32;    /* snap pixel */
 static const int showbar = 1;           /* 0 means no bar */
 static const int topbar = 1;            /* 0 means bottom bar */
 static const char *fonts[] = {
-    "JetBrainsMonoNerdFontMono:pixelsize=14:antialias=true:autohint=true"};
+    "JetBrainsMonoNerdFontMono:pixelsize=38:antialias=true:autohint=true"};
 static const char dmenufont[] =
-    "JetBrainsMonoNerdFontMono:pixelsize=14:antialias=true:autohint=true";
+    "JetBrainsMonoNerdFontMono:pixelsize=38:antialias=true:autohint=true";
 static const char col_gray1[] = "#222222";
 static const char col_gray2[] = "#444444";
 static const char col_gray3[] = "#bbbbbb";
@@ -33,7 +33,7 @@ static const Rule rules[] = {
      */
     /* class      instance    title       tags mask     isfloating   monitor */
     {"Gimp", NULL, NULL, 0, 1, -1},
-    {"Firefox", NULL, NULL, 1 << 8, 0, -1},
+    {"Firefox", NULL, NULL, 1 << 1, 0, -1},
     {"LibreWolf", "Toolkit", "Picture-in-Picture", 0, 1, -1},
     {"Steam", NULL, NULL, 0, 1, -1},
 };
